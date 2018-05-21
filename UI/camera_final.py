@@ -20,14 +20,19 @@ from UI.result_final import Ui_Demo_Result
 from PIL import Image
 from PIL.ImageQt import ImageQt
 class Ui_Camera(object):
+    def __init__(self, model):
+        self.model = model
+
     def openResultCamera(self):
+
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Demo_Result()
-        self.ui.setupUi(self.window, self.image)
+        self.ui.setupUi(self.window, self.model, self.image)
+        # self.ui.setupUi(self.window, self.image)
         self.window.show()
 
     def convert(self,img):
-
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         height, width, channel = img.shape
         bytesPerLine = 3 * width
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
@@ -42,14 +47,16 @@ class Ui_Camera(object):
         self.cap = cv2.VideoCapture(0)
         # QApplication.processEvents()
         while self.capturing:
+            print("camera")
             _, frame = self.cap.read()
             image["img"] = frame
             if self.ImageQueue.qsize() < 10:
                 self.ImageQueue.put(image)
-            else:
-                print(self.ImageQueue.qsize())
+            # else:
+            #     print(self.ImageQueue.qsize())
 
     def updateimage(self):
+        print("timer")
         if not self.ImageQueue.empty():
             frame = self.ImageQueue.get()
             img = frame["img"]
@@ -77,13 +84,13 @@ class Ui_Camera(object):
         self.ThreadGetImage = Thread(target=self.openCamera)
         self.ThreadGetImage.start()
 
-    def setupUi(self, Camera):
+    def setupUi(self, Camera ):
         self.image = None
         self.ImageQueue = Queue()
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateimage)
-        self.timer.start(1)
+        self.timer.start(30)
 
         self.scene = QGraphicsScene()
 

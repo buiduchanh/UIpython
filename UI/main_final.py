@@ -18,19 +18,25 @@ from keras.models import load_model
 from keras.preprocessing import image
 import numpy as np
 
+model = None
 
 # model = load_model('/home/buiduchanh/WorkSpace/demo_jestson/model/weights.21-0.88502994.hdf5',
 #                        custom_objects={"Scale": Scale})
 # nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
 # model.compile(optimizer=nadam, loss='categorical_crossentropy', metrics=['accuracy'])
 class Ui_Demo_ACR(object):
-    # def __init__(self):
+    def __init__(self):
+        self.model = load_model('/home/buiduchanh/WorkSpace/demo_jestson/model/weights.21-0.88502994.hdf5',
+                               custom_objects={"Scale": Scale})
+        self.nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
+        self.model.compile(optimizer=self.nadam, loss='categorical_crossentropy', metrics=['accuracy'])
 
 
     def openCamera(self):
         self.window = QtWidgets.QMainWindow()
-        self.ui = Ui_Camera()
-        self.ui.setupUi(self.window)
+        self.ui = Ui_Camera(self.model)
+        # self.ui = Ui_Camera()
+        self.ui.setupUi(self.window )
         self.window.show()
         self.ui.startcamera()
 
@@ -43,14 +49,11 @@ class Ui_Demo_ACR(object):
 
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Demo_Result()
-        self.ui.setupUi(self.window, self.fname)
+        self.ui.setupUi(self.window, self.model, self.fname)
         self.window.show()
 
     def setupUi(self, Demo_ACR):
-        self.model = load_model('/home/buiduchanh/WorkSpace/demo_jestson/model/weights.21-0.88502994.hdf5',
-                                custom_objects={"Scale": Scale})
-        self.nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
-        self.model.compile(optimizer=self.nadam, loss='categorical_crossentropy', metrics=['accuracy'])
+
 
 
         Demo_ACR.setObjectName("Demo_ACR")

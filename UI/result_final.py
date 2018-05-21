@@ -13,12 +13,15 @@ from PyQt5.QtGui import *
 from processing_image import processing
 
 class Ui_Demo_Result(object):
-    def setupUi(self, Demo_Result, nameimage ):
+    def setupUi(self, Demo_Result, model, nameimage):
+    # def setupUi(self, Demo_Result, nameimage):
         self.fname = nameimage
         w = 801
         h = 561
         self.scene = QGraphicsScene()
-        top5acr = processing(nameimage)
+
+
+        top5acr = processing( model, nameimage)
 
 
         Demo_Result.setObjectName("Demo_Result")
