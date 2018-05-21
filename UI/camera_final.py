@@ -13,15 +13,16 @@ from PyQt5.QtGui import *
 
 from multiprocessing import Queue
 from multiprocessing.dummy import Pool as ThreadPool
-
+from time import sleep
 from threading import Thread
 # from image_result import Ui_ImageCar
-from UI.result_final import Ui_Demo_Result
+from result_final import Ui_Demo_Result
 from PIL import Image
 from PIL.ImageQt import ImageQt
 class Ui_Camera(object):
     def __init__(self, model):
         self.model = model
+        # self.timer = None
 
     def openResultCamera(self):
 
@@ -40,6 +41,14 @@ class Ui_Camera(object):
         # qImg = Image.merge("RGBA", (b, g, r, a))
         return qImg
 
+    def close(self):
+        self.capturing = False
+        # self.timer.stop()
+        # self.ThreadGetImage.quit()
+        # self.timer.destroyed()
+        # self.ImageQueue = Queue()
+        print("stop")
+
     def openCamera(self):
         # Videopath = '/media/buiduchanh/Work/SUBARU_1.mov'
         image ={}
@@ -47,24 +56,30 @@ class Ui_Camera(object):
         self.cap = cv2.VideoCapture(0)
         # QApplication.processEvents()
         while self.capturing:
-            print("camera")
+            # print("camera")
             _, frame = self.cap.read()
             image["img"] = frame
             if self.ImageQueue.qsize() < 10:
                 self.ImageQueue.put(image)
             # else:
             #     print(self.ImageQueue.qsize())
+        print("finish")
 
     def updateimage(self):
-        print("timer")
-        if not self.ImageQueue.empty():
+        # while self.capturing:
+        # print("timer")
+        #     sleep(0.03)
+        print("qsize",self.ImageQueue.qsize())
+        if self.ImageQueue.qsize() > 0:
             frame = self.ImageQueue.get()
-            img = frame["img"]
-            data = self.convert(img)
-            # _image = QPixmap(data).scaled(601, 341)
-            _image = QtGui.QPixmap.fromImage(data).scaled(811, 501)
 
-            self.setImage(_image)
+            if frame:
+                img = frame["img"]
+                data = self.convert(img)
+                # _image = QPixmap(data).scaled(601, 341)
+                _image = QtGui.QPixmap.fromImage(data).scaled(811, 501)
+
+                self.setImage(_image)
 
     def setImage(self, _image):
         self.image = _image
@@ -84,10 +99,14 @@ class Ui_Camera(object):
         self.ThreadGetImage = Thread(target=self.openCamera)
         self.ThreadGetImage.start()
 
+        # self.ThreadDis = Thread(target= self.updateimage)
+        # self.ThreadDis.start()
+
     def setupUi(self, Camera ):
         self.image = None
         self.ImageQueue = Queue()
 
+        # if self.timer is None:
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateimage)
         self.timer.start(30)

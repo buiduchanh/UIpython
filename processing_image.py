@@ -22,8 +22,9 @@ from PyQt5.QtCore import QBuffer
 
 from PIL import Image
 LABELS = {0:'T0_018', 1:'T0_019', 2:'T0_020'}
-tmp = []
+# tmp = []
 def processing( model, images):
+    tmp = []
     # print(images)
     img_rows, img_cols = 224, 224
     # model = load_model('/home/buiduchanh/WorkSpace/demo_jestson/model/weights.21-0.88502994.hdf5', custom_objects={"Scale": Scale})
