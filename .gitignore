@@ -1,0 +1,3 @@
+model/*.hdf5
+test/*
+.idea/
