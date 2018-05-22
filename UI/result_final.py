@@ -6,24 +6,36 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
-sys.path.insert(0, '/home/buiduchanh/WorkSpace/demo_jestson/')
-
-from PyQt5 import QtCore, QtWidgets
+sys.path.insert(0, '/home/nvidia/hanh_demo/UIpython/recognition/')
+# sys.path.insert(0, '/home/buiduchanh/WorkSpace/demo_jestson/recognition/')
+import cv2
+from PyQt5 import QtCore, QtWidgets,QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from processing_image import processing
+
+from processing import get_model
 
 class Ui_Demo_Result(object):
-    def setupUi(self, Demo_Result, model, nameimage):
+
+    def convert_img(self,img):
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        height, width, channel = img.shape
+        bytesPerLine = 3 * width
+        qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
+        # r, g, b, a = qImg.split()
+        # qImg = Image.merge("RGBA", (b, g, r, a))
+        return qImg
+
+
+    def setupUi(self, Demo_Result, nameimage):
     # def setupUi(self, Demo_Result, nameimage):
         self.fname = nameimage
-        w = 801
-        h = 561
+        # w = 801
+        # h = 561
         self.scene = QGraphicsScene()
+        print(type(nameimage))
 
-
-        top5acr = processing( model, nameimage)
-
+        results = get_model(nameimage)
 
         Demo_Result.setObjectName("Demo_Result")
         Demo_Result.resize(797, 600)
@@ -35,16 +47,18 @@ class Ui_Demo_Result(object):
         self.Result.setGeometry(QtCore.QRect(0, 0, 801, 561))
         self.Result.setObjectName("Result")
 
-        nameimage = QPixmap(self.fname).scaled(w, h)
-        self.scene.addPixmap(nameimage)
+        img = self.convert_img(nameimage)
+        _image = QtGui.QPixmap.fromImage(img).scaled(801, 561)
+        self.scene.addPixmap(_image)
         self.Result.setScene(self.scene)
 
+
         self.Accuracy = QtWidgets.QTextBrowser(self.centralwidget)
-        self.Accuracy.setGeometry(QtCore.QRect(0, 0, 231, 111))
+        self.Accuracy.setGeometry(QtCore.QRect(0, 0, 235, 95))
+        # self.Accuracy.setGeometry(QtCore.QRect(0, 0, 271, 31))
         self.Accuracy.setObjectName("Accuracy")
         Demo_Result.setCentralWidget(self.centralwidget)
-
-        self.Accuracy.append(top5acr)
+        self.Accuracy.append("{}\n{}\n{}".format(''.join(results[0]),''.join(results[1]),''.join(results[2])))
 
         self.menubar = QtWidgets.QMenuBar(Demo_Result)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 797, 25))

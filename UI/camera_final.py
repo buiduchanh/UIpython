@@ -11,24 +11,29 @@ import cv2
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
+# from PyQt5.QtCore import QThread
+import PIL
 from multiprocessing import Queue
 from multiprocessing.dummy import Pool as ThreadPool
 from time import sleep
 from threading import Thread
 # from image_result import Ui_ImageCar
 from result_final import Ui_Demo_Result
+import numpy as np
 from PIL import Image
 from PIL.ImageQt import ImageQt
+
 class Ui_Camera(object):
-    def __init__(self, model):
-        self.model = model
+    # def __init__(self, model):
+    #     self.model = model
         # self.timer = None
 
     def openResultCamera(self):
 
+
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Demo_Result()
-        self.ui.setupUi(self.window, self.model, self.image)
+        self.ui.setupUi(self.window, self.imageprocesing)
         # self.ui.setupUi(self.window, self.image)
         self.window.show()
 
@@ -47,7 +52,7 @@ class Ui_Camera(object):
         # self.ThreadGetImage.quit()
         # self.timer.destroyed()
         # self.ImageQueue = Queue()
-        print("stop")
+        # print("stop")
 
     def openCamera(self):
         # Videopath = '/media/buiduchanh/Work/SUBARU_1.mov'
@@ -63,18 +68,19 @@ class Ui_Camera(object):
                 self.ImageQueue.put(image)
             # else:
             #     print(self.ImageQueue.qsize())
-        print("finish")
+        # print("finish")
 
     def updateimage(self):
         # while self.capturing:
         # print("timer")
         #     sleep(0.03)
-        print("qsize",self.ImageQueue.qsize())
+        # print("qsize",self.ImageQueue.qsize())
         if self.ImageQueue.qsize() > 0:
             frame = self.ImageQueue.get()
 
             if frame:
                 img = frame["img"]
+                self.imageprocesing = img
                 data = self.convert(img)
                 # _image = QPixmap(data).scaled(601, 341)
                 _image = QtGui.QPixmap.fromImage(data).scaled(811, 501)
@@ -103,6 +109,7 @@ class Ui_Camera(object):
         # self.ThreadDis.start()
 
     def setupUi(self, Camera ):
+        self.imageprocesing = None
         self.image = None
         self.ImageQueue = Queue()
 

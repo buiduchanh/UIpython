@@ -12,10 +12,10 @@ from PyQt5.QtWidgets import *
 from camera_final import Ui_Camera
 from result_final import Ui_Demo_Result
 
-from custom_layers.scale_layer import Scale
-from keras.optimizers import Nadam
-from keras.models import load_model
-from keras.preprocessing import image
+# from custom_layers.scale_layer import Scale
+# from keras.optimizers import Nadam
+# from keras.models import load_model
+# from keras.preprocessing import image
 import numpy as np
 from time import sleep
 # model = None
@@ -25,12 +25,12 @@ from time import sleep
 # nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
 # model.compile(optimizer=nadam, loss='categorical_crossentropy', metrics=['accuracy'])
 class Ui_Demo_ACR(object):
-    def __init__(self):
-        self.ui = None
-        self.model = load_model('/home/buiduchanh/WorkSpace/demo_jestson/model/weights.21-0.88502994.hdf5',
-                               custom_objects={"Scale": Scale})
-        self.nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
-        self.model.compile(optimizer=self.nadam, loss='categorical_crossentropy', metrics=['accuracy'])
+    # def __init__(self):
+    #     self.ui = None
+    #     self.model = load_model('/home/buiduchanh/WorkSpace/demo_jestson/model/weights.21-0.88502994.hdf5',
+    #                            custom_objects={"Scale": Scale})
+    #     self.nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
+    #     self.model.compile(optimizer=self.nadam, loss='categorical_crossentropy', metrics=['accuracy'])
 
 
     def openCamera(self):
@@ -41,9 +41,7 @@ class Ui_Demo_ACR(object):
         #     sleep(1)
         #     sys.exit(app.exec_())
         # else:
-        self.ui = Ui_Camera(self.model)
-
-        # self.ui = Ui_Camera()
+        self.ui = Ui_Camera()
         self.ui.setupUi(self.window )
         self.window.show()
         self.ui.startcamera()
@@ -57,7 +55,7 @@ class Ui_Demo_ACR(object):
 
         self.window = QtWidgets.QMainWindow()
         self.uiim = Ui_Demo_Result()
-        self.uiim.setupUi(self.window, self.model, self.fname)
+        self.uiim.setupUi(self.window, self.fname)
         self.window.show()
 
     def setupUi(self, Demo_ACR):
@@ -114,5 +112,6 @@ if __name__ == "__main__":
     ui = Ui_Demo_ACR()
     ui.setupUi(Demo_ACR)
     Demo_ACR.show()
+    print("load finished")
     sys.exit(app.exec_())
 
