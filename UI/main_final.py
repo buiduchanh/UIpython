@@ -5,12 +5,20 @@
 # Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
+
+import sys
+sys.path.insert(0, '/home/nvidia/hanh_demo/recognition/')
+# sys.path.insert(0, '/home/buiduchanh/WorkSpace/demo_jestson/recognition/')
+
 from PIL.ImageQt import ImageQt
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 from camera_final import Ui_Camera
 from result_final import Ui_Demo_Result
+import cv2 as cv
+import tensorflow as tf
+from processing import Recognizor
 
 # from custom_layers.scale_layer import Scale
 # from keras.optimizers import Nadam
@@ -24,16 +32,17 @@ from time import sleep
 #                        custom_objects={"Scale": Scale})
 # nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
 # model.compile(optimizer=nadam, loss='categorical_crossentropy', metrics=['accuracy'])
+# MODEL_PATH = '/home/nvidia/hanh_demo/UIpython/model/frozen_acr_front_view.pb'
+
 class Ui_Demo_ACR(object):
-    # def __init__(self):
-    #     self.ui = None
-    #     self.model = load_model('/home/buiduchanh/WorkSpace/demo_jestson/model/weights.21-0.88502994.hdf5',
-    #                            custom_objects={"Scale": Scale})
-    #     self.nadam = Nadam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
-    #     self.model.compile(optimizer=self.nadam, loss='categorical_crossentropy', metrics=['accuracy'])
-
-
+    # MODEL_PATH = '/home/nvidia/hanh_demo/model/frozen_acr_front_view.pb'
+    # MODEL_PATH = '/home/buiduchanh/WorkSpace/demo_jestson/model/frozen_acr_front_view.pb'
+    def __init__(self):
+        self.recognizor = Recognizor.getInstance()
+        print("loadmodel_success")
     def openCamera(self):
+
+        print("start_opencamera")
         self.window = QtWidgets.QMainWindow()
         # if self.ui is not None:
         #     print("have")
@@ -42,25 +51,27 @@ class Ui_Demo_ACR(object):
         #     sys.exit(app.exec_())
         # else:
         self.ui = Ui_Camera()
-        self.ui.setupUi(self.window )
+        self.ui.setupUi(self.window)
         self.window.show()
         self.ui.startcamera()
 
+
     def openImage(self):
+        print("select_image")
         w = 751
         h = 331
         self.fname, _ = QFileDialog.getOpenFileName(None, "Open file",
                                                     # "", "Image files (*.mov)")
                                                     "", "All files (*.jpg *.gif *.mov)")
 
+        print('get image file success')
         self.window = QtWidgets.QMainWindow()
         self.uiim = Ui_Demo_Result()
-        self.uiim.setupUi(self.window, self.fname)
+        self.uiim.setupUi(self.window, cv.imread(self.fname))
         self.window.show()
 
     def setupUi(self, Demo_ACR):
-
-
+        print("start_demo")
 
         Demo_ACR.setObjectName("Demo_ACR")
         Demo_ACR.resize(300, 179)

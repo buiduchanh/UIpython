@@ -6,30 +6,22 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, Qt
+
 import cv2
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
-# from PyQt5.QtCore import QThread
-import PIL
 from multiprocessing import Queue
-from multiprocessing.dummy import Pool as ThreadPool
-from time import sleep
 from threading import Thread
-# from image_result import Ui_ImageCar
 from result_final import Ui_Demo_Result
-import numpy as np
-from PIL import Image
-from PIL.ImageQt import ImageQt
 
 class Ui_Camera(object):
-    # def __init__(self, model):
-    #     self.model = model
-        # self.timer = None
+    # def __init__(self):
+    def __init__(self):
+        self.flag = True
 
     def openResultCamera(self):
-
 
         self.window = QtWidgets.QMainWindow()
         self.ui = Ui_Demo_Result()
@@ -42,47 +34,42 @@ class Ui_Camera(object):
         height, width, channel = img.shape
         bytesPerLine = 3 * width
         qImg = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
-        # r, g, b, a = qImg.split()
-        # qImg = Image.merge("RGBA", (b, g, r, a))
         return qImg
 
-    def close(self):
+    def close_application(self):
+
         self.capturing = False
-        # self.timer.stop()
-        # self.ThreadGetImage.quit()
-        # self.timer.destroyed()
-        # self.ImageQueue = Queue()
-        # print("stop")
+        self.timer.stop()
+        print("stop")
+        QCloseEvent()
+
+
 
     def openCamera(self):
-        # Videopath = '/media/buiduchanh/Work/SUBARU_1.mov'
+        print("extract image")
         image ={}
         self.capturing = True
-        self.cap = cv2.VideoCapture(0)
-        # QApplication.processEvents()
+        self.cap = cv2.VideoCapture("nvcamerasrc ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)I420, framerate=(fraction)30/1 ! nvvidconv flip-method=2 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink")
+        # self.cap = cv2.VideoCapture(0)
         while self.capturing:
             # print("camera")
             _, frame = self.cap.read()
             image["img"] = frame
             if self.ImageQueue.qsize() < 10:
                 self.ImageQueue.put(image)
-            # else:
-            #     print(self.ImageQueue.qsize())
-        # print("finish")
 
     def updateimage(self):
-        # while self.capturing:
-        # print("timer")
-        #     sleep(0.03)
-        # print("qsize",self.ImageQueue.qsize())
+        print("update_image")
+        print("qsize",self.ImageQueue.qsize())
         if self.ImageQueue.qsize() > 0:
             frame = self.ImageQueue.get()
-
+            # if self.flag == True:
+            #
             if frame:
+
                 img = frame["img"]
                 self.imageprocesing = img
                 data = self.convert(img)
-                # _image = QPixmap(data).scaled(601, 341)
                 _image = QtGui.QPixmap.fromImage(data).scaled(811, 501)
 
                 self.setImage(_image)
@@ -92,23 +79,18 @@ class Ui_Camera(object):
         self.display(self.image)
 
     def display(self,frame):
-
-        self.scene.addPixmap(frame)
-        self.graphicsView.setScene(self.scene)
-
-            # _,frame = self.cap.read()
-            # self.graphicsView.update():
-
+        if frame is not None:
+            print("display")
+            self.scene.addPixmap(frame)
+            self.graphicsView.setScene(self.scene)
 
     def startcamera(self):
+        print("Thread get image start")
 
         self.ThreadGetImage = Thread(target=self.openCamera)
         self.ThreadGetImage.start()
 
-        # self.ThreadDis = Thread(target= self.updateimage)
-        # self.ThreadDis.start()
-
-    def setupUi(self, Camera ):
+    def setupUi(self, Camera):
         self.imageprocesing = None
         self.image = None
         self.ImageQueue = Queue()
@@ -130,17 +112,13 @@ class Ui_Camera(object):
         self.graphicsView.setGeometry(QtCore.QRect(-5, 1, 811, 501))
         self.graphicsView.setObjectName("graphicsView")
 
-
-        # self.Livecamera = QtWidgets.QPushButton(self.centralwidget)
-        # self.Livecamera.setGeometry(QtCore.QRect(180, 520, 99, 27))
-        # self.Livecamera.setObjectName("Livecamera")
-
         self.Capture = QtWidgets.QPushButton(self.centralwidget)
         self.Capture.setGeometry(QtCore.QRect(330, 520, 99, 27))
         self.Capture.setObjectName("Capture")
         Camera.setCentralWidget(self.centralwidget)
 
         self.Capture.clicked.connect(self.openResultCamera)
+        # self.Capture.clicked.connect(self.close_application)
 
         self.menubar = QtWidgets.QMenuBar(Camera)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 25))
@@ -157,7 +135,6 @@ class Ui_Camera(object):
     def retranslateUi(self, Camera):
         _translate = QtCore.QCoreApplication.translate
         Camera.setWindowTitle(_translate("Camera", "Camera"))
-        # self.Livecamera.setText(_translate("Camera", "Live Camera"))
         self.Capture.setText(_translate("Camera", "Capture"))
 
 
@@ -165,6 +142,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Camera = QtWidgets.QMainWindow()
+
     ui = Ui_Camera()
     ui.setupUi(Camera)
     Camera.show()

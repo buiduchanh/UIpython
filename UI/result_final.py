@@ -6,17 +6,17 @@
 #
 # WARNING! All changes made in this file will be lost!
 import sys
-sys.path.insert(0, '/home/nvidia/hanh_demo/UIpython/recognition/')
+sys.path.insert(0, '/home/nvidia/hanh_demo/recognition/')
 # sys.path.insert(0, '/home/buiduchanh/WorkSpace/demo_jestson/recognition/')
 import cv2
 from PyQt5 import QtCore, QtWidgets,QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
-from processing import get_model
+from processing import Recognizor
 
 class Ui_Demo_Result(object):
-
+    print("start_predict")
     def convert_img(self,img):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         height, width, channel = img.shape
@@ -28,15 +28,15 @@ class Ui_Demo_Result(object):
 
 
     def setupUi(self, Demo_Result, nameimage):
-    # def setupUi(self, Demo_Result, nameimage):
         self.fname = nameimage
         # w = 801
         # h = 561
         self.scene = QGraphicsScene()
         print(type(nameimage))
 
-        results = get_model(nameimage)
-
+        recognizer = Recognizor.getInstance()
+        results = recognizer.get_model(nameimage)
+        print("predict_success")
         Demo_Result.setObjectName("Demo_Result")
         Demo_Result.resize(797, 600)
 
